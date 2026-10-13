@@ -1,0 +1,98 @@
+plugins {
+    id 'scala'
+    id 'idea'
+    id 'application'
+}
+
+
+application {
+    mainClass.set( 'snake.game.SnakeGame')
+}
+
+
+
+
+ext {
+    scalaMajorVersion = '3.3'
+    scalaVersion = "${scalaMajorVersion}.8"
+}
+
+
+repositories {
+
+    mavenCentral()
+
+    maven {
+        url = "https://jogamp.org/deployment/maven/"
+    }
+
+    maven {
+        url = "https://jitpack.io"
+    }
+}
+
+sourceSets.main.scala.srcDirs = ['src']
+sourceSets.test.scala.srcDirs = ['test']
+
+dependencies {
+    implementation("org.processing:core:4.4.4")
+    implementation("org.jogamp.gluegen:gluegen-rt-main:2.5.0")
+    // https://mvnrepository.com/artifact/org.jogamp.gluegen/gluegen-rt
+    implementation("org.jogamp.gluegen:gluegen-rt:2.5.0")
+    implementation("org.scala-lang:scala3-library_3:${scalaVersion}")
+    
+    testImplementation('junit:junit:4.13.2')
+    testImplementation("org.scalatest:scalatest_3:3.2.19")
+    testImplementation("org.scalatestplus:junit-4-13_3:3.2.19.0")
+}
+
+task zip(type: Zip) {
+    group = "prepareZipForSubmit"
+    description = "Zip your code for submission to Codegrade"
+
+    // To make sure you can always run this task
+    outputs.upToDateWhen { false }
+    dependsOn assemble
+    dependsOn testClasses
+    from fileTree(dir: '.')
+    include 'src/snake/logic/**.scala'
+
+    archiveFileName = 'snake.zip'
+    destinationDirectory = layout.buildDirectory.dir("$projectDir")
+}
+
+task test2_1(type: Test) {
+    description="Run tests for assignment 2.1 (snake)"
+    testClassesDirs = sourceSets.test.output.classesDirs
+    classpath = sourceSets.test.runtimeClasspath
+    filter {
+        includeTestsMatching "snake.SnakeTestsAssignment2_1"
+    }
+}
+
+task test2_3(type: Test) {
+    description="Run tests for assignment 2.3 (snake)"
+    testClassesDirs = sourceSets.test.output.classesDirs
+    classpath = sourceSets.test.runtimeClasspath
+    filter {
+        includeTestsMatching "snake.SnakeTestsAssignment2_3"
+    }
+}
+
+task fraction2_1(type: JavaExec, dependsOn: classes) {
+    // To make sure you can always run this task
+    outputs.upToDateWhen { false }
+    mainClass.set('infrastructure.ReportFraction2_1')
+    classpath sourceSets.test.runtimeClasspath
+    classpath sourceSets.main.runtimeClasspath
+    //classpath configurations.runtime
+}
+
+task fraction2_3(type: JavaExec, dependsOn: classes) {
+    // To make sure you can always run this task
+    outputs.upToDateWhen { false }
+    mainClass.set('infrastructure.ReportFraction2_3')
+    classpath sourceSets.test.runtimeClasspath
+    classpath sourceSets.main.runtimeClasspath
+    //classpath configurations.runtime
+}
