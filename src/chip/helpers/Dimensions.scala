@@ -1,4 +1,5 @@
-package chip.logic
+package chip.helpers
+import chip.helpers.Point
 
 case class Dimensions(width : Int, height : Int) {
   // scanned from left to right, top to bottom

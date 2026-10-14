@@ -8,8 +8,10 @@ import processing.event.KeyEvent
 import java.awt.event.KeyEvent._
 import engine.ChipBase
 import engine.graphics.{Color, Point, Rectangle}
-import chip.logic.{Dimensions, ChipLogic, Point => GridPoint}
+import chip.logic.{ChipLogic}
+import chip.helpers.{Dimensions, Point => GridPoint}
 import engine.graphics.Color._
+import chip.logic.ChipRomReader
 
 class main extends ChipBase {
 
@@ -73,13 +75,13 @@ class main extends ChipBase {
   }
 
   override def setup(): Unit = {
-    // Fonts are loaded lazily, so when we call text()
-    // for the first time, there is significant lag.
-    // This prevents it from happening during execution.
+    chipLogic.loadROM("ROMs\\IbmLogo.ch8")
+    
+    // Loads fonts used for window drawing (not the ones in memory)
     text("", 0, 0)
-    // This should be called last, since the chip
-    // clock is officially ticking at this point
+
     instructionTimer.init()
+    timerDecTimer.init()
   }
 
 
@@ -89,7 +91,7 @@ class main extends ChipBase {
       instructionTimer.advanceFrame()
     }
     if (timerDecTimer.timeForNextFrame()) {
-      chipLogic.decrementTimers()
+      //chipLogic.decrementTimers()
       timerDecTimer.advanceFrame()
     }
   }

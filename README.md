@@ -1,6 +1,7 @@
 gen AI use -
-1. I used AI to generate an initial ChipState case class according to the specifications found in source 1
+1. Initial ChipState case class
+2. Instruction case classes
+3.
 
 
-
-source 1 - https://tobiasvl.github.io/blog/write-a-chip-8-emulator/
+source - https://tobiasvl.github.io/blog/write-a-chip-8-emulator/
