@@ -40,7 +40,8 @@ case class ChipState(
     }
 
     def step(): ChipState = {
-        require(isValidAddress(programCounter + 1), "Program counter must point to a complete instruction in memory")
+        require(isValidAddress(programCounter + 1), 
+                "Program counter must point to a complete instruction in memory")
 
         val opcode = (memory(programCounter) << 8) | memory(programCounter + 1)
         val instruction = InstructionDecoder.decode(opcode)
@@ -57,9 +58,7 @@ object ChipState {
 
     ChipState(
       gridDims = gridDims,
-      display = Vector.fill(gridDims.height)(
-        Vector.fill(gridDims.width)(false)
-      )
+      display = Vector.fill(gridDims.height)(Vector.fill(gridDims.width)(false))
     )
   }
 }
