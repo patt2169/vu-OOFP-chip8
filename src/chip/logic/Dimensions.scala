@@ -1,6 +1,4 @@
-package snake.logic
-
-// you can alter this file!
+package chip.logic
 
 case class Dimensions(width : Int, height : Int) {
   // scanned from left to right, top to bottom

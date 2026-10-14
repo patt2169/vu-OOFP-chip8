@@ -1,4 +1,3 @@
-// DO NOT MODIFY FOR BASIC SUBMISSION
 // scalastyle:off
 
 package engine
@@ -7,7 +6,7 @@ import engine.graphics.Color.Black
 import engine.graphics.{Color, Point, Rectangle, Triangle}
 import processing.core.{PApplet, PConstants}
 
-class GameBase   extends PApplet {
+class ChipBase extends PApplet {
 
   // inner class: can call current time of outer class
   class UpdateTimer(val framesPerSecond: Float) {
