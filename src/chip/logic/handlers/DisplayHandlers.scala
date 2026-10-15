@@ -1,22 +1,22 @@
 package chip.logic.handlers
 
-import chip.logic.ChipState
-import chip.logic.ChipLogic
+import chip.logic.{ChipLogic, ChipState}
 
-object DisplayHandlers {
-    def handleClearScreen(state: ChipState): ChipState = {
-        state.copy(display = Vector.fill(state.gridDims.height)(Vector.fill(state.gridDims.width)(false)))
+trait DisplayHandlers {
+    self: ChipState =>
+
+    def handleClearScreen(): ChipState = {
+        copy(display = Vector.fill(gridDims.height)(Vector.fill(gridDims.width)(false)))
     }
 
-    def handleDrawSprite(state: ChipState, xReg: Int, yReg: Int, n: Int): ChipState = {
-        import state.*
+    def handleDrawSprite(xReg: Int, yReg: Int, n: Int): ChipState = {
         require(
             indexRegister + n <= memory.length,
             "Sprite data must fit in memory"
         )
 
-        val startX = state.registers(xReg) % gridDims.width
-        val startY = state.registers(yReg) % gridDims.height
+        val startX = registers(xReg) % gridDims.width
+        val startY = registers(yReg) % gridDims.height
         val visibleRows = math.min(n, gridDims.height - startY)
         val (updatedDisplay, collision) =
             (0 until visibleRows).foldLeft((display, false)) {
@@ -45,6 +45,6 @@ object DisplayHandlers {
             ChipLogic.FlagRegisterIndex, 
             if(collision) 1 else 0
         )
-        state.copy(display = updatedDisplay, registers = updatedRegisters)
+        copy(display = updatedDisplay, registers = updatedRegisters)
     }
 }

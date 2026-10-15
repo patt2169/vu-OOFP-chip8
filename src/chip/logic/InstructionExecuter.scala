@@ -1,9 +1,5 @@
 package chip.logic
 
-import chip.logic.handlers.DisplayHandlers._
-import chip.logic.handlers.RegisterHandlers._
-import chip.logic.handlers.ControlFlowHandlers._
-
 object InstructionExecuter {
     def execute(state: ChipState, instruction: Instruction): ChipState = {
         instruction match {
@@ -11,73 +7,73 @@ object InstructionExecuter {
                 println("Error instruction in Executer: " + e.toString())
                 state.copy(stopExecution = true)
             case ClearScreen =>
-                handleClearScreen(state)
+                state.handleClearScreen()
             case Jump(nnn) =>
-                handleJump(state, nnn)
+                state.handleJump(nnn)
             case JumpWithOffset(nnn) =>
-                handleJumpWithOffset(state, nnn)
+                state.handleJumpWithOffset(nnn)
             case SetRegister(reg, nn) =>
-                handleSetRegister(state, reg, nn)
+                state.handleSetRegister(reg, nn)
             case AddRegister(reg, nn) =>
-                handleAddRegister(state, reg, nn)
+                state.handleAddRegister(reg, nn)
             case SetIndex(nnn) =>
-                handleSetIndex(state, nnn)
+                state.handleSetIndex(nnn)
             case DrawSprite(xReg, yReg, n) =>
-                handleDrawSprite(state, xReg, yReg, n)
+                state.handleDrawSprite(xReg, yReg, n)
             case CallSubroutine(nnn) =>
-                handleCallSubroutine(state, nnn)
+                state.handleCallSubroutine(nnn)
             case ReturnSubroutine => 
-                handleReturnSubroutine(state)
+                state.handleReturnSubroutine()
             case SkipEqualsConst(xReg, nn) =>
-                handleSkipEqualsConst(state, xReg, nn)
+                state.handleSkipEqualsConst(xReg, nn)
             case SkipNotEqualsConst(xReg, nn) =>
-                handleSkipNotEqualsConst(state, xReg, nn)
+                state.handleSkipNotEqualsConst(xReg, nn)
             case SkipEqualsReg(xReg, yReg) =>
-                handleSkipEqualsReg(state, xReg, yReg)
+                state.handleSkipEqualsReg(xReg, yReg)
             case SkipNotEqualsReg(xReg, yReg) =>
-                handleSkipNotEqualsReg(state, xReg, yReg)
+                state.handleSkipNotEqualsReg(xReg, yReg)
             case SkipIfKeyPressed(xReg) =>
-                handleSkipIfKeyPressed(state, xReg)
+                state.handleSkipIfKeyPressed(xReg)
             case SkipIfKeyNotPressed(xReg) =>
-                handleSkipIfKeyNotPressed(state, xReg)
+                state.handleSkipIfKeyNotPressed(xReg)
             case SetRegisterReg(xReg, yReg) =>
-                handleSetRegisterReg(state, xReg, yReg)
+                state.handleSetRegisterReg(xReg, yReg)
             case OrRegister(xReg, yReg) =>
-                handleOrRegister(state, xReg, yReg)
+                state.handleOrRegister(xReg, yReg)
             case AndRegister(xReg, yReg) =>
-                handleAndRegister(state, xReg, yReg)
+                state.handleAndRegister(xReg, yReg)
             case XorRegister(xReg, yReg) =>
-                handleXorRegister(state, xReg, yReg)
+                state.handleXorRegister(xReg, yReg)
             case AddRegisterReg(xReg, yReg) =>
-                handleAddRegisterReg(state, xReg, yReg)
+                state.handleAddRegisterReg(xReg, yReg)
             case SubtractRegisterReg(xReg, yReg) =>
-                handleSubtractRegisterReg(state, xReg, yReg)
+                state.handleSubtractRegisterReg(xReg, yReg)
             case SubtractRegisterRegReverse(xReg, yReg) =>
-                handleSubtractRegisterRegReverse(state, xReg, yReg)
+                state.handleSubtractRegisterRegReverse(xReg, yReg)
             case ShiftRightRegister(xReg) =>
-                handleShiftRightRegister(state, xReg)
+                state.handleShiftRightRegister(xReg)
             case ShiftLeftRegister(xReg) =>
-                handleShiftLeftRegister(state, xReg)
+                state.handleShiftLeftRegister(xReg)
             case GetRandom(xReg, nn) => 
-                handleGetRandom(state, xReg, nn)
+                state.handleGetRandom(xReg, nn)
             case GetDelayTimer(xReg) =>
-                handleGetDelayTimer(state, xReg)
+                state.handleGetDelayTimer(xReg)
             case SetDelayTimer(xReg) =>
-                handleSetDelayTimer(state, xReg)
+                state.handleSetDelayTimer(xReg)
             case SetSoundTimer(xReg) =>
-                handleSetSoundTimer(state, xReg)
+                state.handleSetSoundTimer(xReg)
             case AddIndexRegister(xReg) =>
-                handleAddIndexRegister(state, xReg)
+                state.handleAddIndexRegister(xReg)
             case GetKey(xReg) =>
-                handleGetKey(state, xReg)
+                state.handleGetKey(xReg)
             case SetIndexToFontCharacter(xReg) =>
-                handleSetIndexToFontCharacter(state, xReg)
+                state.handleSetIndexToFontCharacter(xReg)
             case StoreBCD(xReg) =>
-                handleStoreBCD(state, xReg)
+                state.handleStoreBCD(xReg)
             case StoreRegisters(xReg) =>
-                handleStoreRegisters(state, xReg)
+                state.handleStoreRegisters(xReg)
             case LoadRegisters(xReg) =>
-                handleLoadRegisters(state, xReg)
+                state.handleLoadRegisters(xReg)
         }
     }
 }

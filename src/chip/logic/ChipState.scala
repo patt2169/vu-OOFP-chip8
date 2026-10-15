@@ -1,5 +1,8 @@
 package chip.logic
 import chip.helpers._
+import chip.logic.handlers.ControlFlowOps
+import chip.logic.handlers.DisplayHandlers
+import chip.logic.handlers.RegisterHandlers
 
 case class ChipState(
     // TODO: consider changing Ints to more specific
@@ -15,7 +18,7 @@ case class ChipState(
     soundTimer: Int = 0,
     registers: Vector[Int] = Vector.fill(ChipLogic.RegisterCount)(0),
     keypad: Vector[Boolean] = Vector.fill(ChipLogic.KeyCount)(false)
-) {
+) extends ControlFlowOps with RegisterHandlers with DisplayHandlers {
     require(memory.length == ChipLogic.MemorySize, "CHIP-8 memory must contain 4096 bytes")
     require(memory.forall(byte => byte >= 0 && byte <= 0xff), "Memory values must be bytes")
     require(display.length == gridDims.height, "Display height must match grid dimensions")
