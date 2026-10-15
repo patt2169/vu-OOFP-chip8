@@ -21,7 +21,12 @@ object InstructionDecoder {
             case 0x2 => CallSubroutine(nnn)
             case 0x3 => SkipEqualsConst(xReg, nn)
             case 0x4 => SkipNotEqualsConst(xReg, nn)
-            case 0x5 => SkipEqualsReg(xReg, yReg)
+            
+            case 0x5 => n match {
+                case 0x0 => SkipEqualsReg(xReg, yReg)
+                case _   => UnsupportedOpcode(opcode)
+            }
+
             case 0x6 => SetRegister(xReg, nn)
             case 0x7 => AddRegister(xReg, nn)
             
@@ -38,7 +43,11 @@ object InstructionDecoder {
                 case _   => UnsupportedOpcode(opcode)
             }
             
-            case 0x9 => SkipNotEqualsReg(xReg, yReg)
+            case 0x9 => n match {
+                case 0x0 => SkipNotEqualsReg(xReg, yReg)
+                case _   => UnsupportedOpcode(opcode)
+            }
+
             case 0xA => SetIndex(nnn)
             case 0xB => JumpWithOffset(nnn)
             case 0xC => GetRandom(xReg, nn)
@@ -49,7 +58,7 @@ object InstructionDecoder {
                 case 0xA1 => SkipIfKeyNotPressed(xReg)
                 case _    => UnsupportedOpcode(opcode)
             }
-            
+
             case 0xF => nn match {
                 case 0x07 => GetDelayTimer(xReg)
                 case 0x15 => SetDelayTimer(xReg)
