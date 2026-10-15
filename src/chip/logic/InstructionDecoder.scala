@@ -43,11 +43,13 @@ object InstructionDecoder {
             case 0xB => JumpWithOffset(nnn)
             case 0xC => GetRandom(xReg, nn)
             case 0xD => DrawSprite(xReg, yReg, n)
+
             case 0xE => nn match {
                 case 0x9E => SkipIfKeyPressed(xReg)
                 case 0xA1 => SkipIfKeyNotPressed(xReg)
                 case _    => UnsupportedOpcode(opcode)
             }
+            
             case 0xF => nn match {
                 case 0x07 => GetDelayTimer(xReg)
                 case 0x15 => SetDelayTimer(xReg)

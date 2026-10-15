@@ -7,6 +7,19 @@ object RegisterHandlers {
   def handleSetRegister(state: ChipState, reg: Int, value: Int): ChipState = {
     state.copy(registers = state.registers.updated(reg, value & 0xff))
   }
+  def handleSetIndex(state: ChipState, nnn: Int): ChipState = {
+    state.copy(indexRegister = nnn)
+  }
+  def handleSetDelayTimer(state: ChipState, xReg: Int): ChipState = {
+    state.copy(delayTimer = state.registers(xReg))
+  }
+  def handleSetSoundTimer(state: ChipState, xReg: Int): ChipState = {
+    state.copy(soundTimer = state.registers(xReg))
+  }
+
+  def handleGetDelayTimer(state: ChipState, xReg: Int): ChipState = {
+    handleSetRegister(state, xReg, state.delayTimer)
+  }
   def handleAddRegister(state: ChipState, reg: Int, value: Int): ChipState = {
     handleSetRegister(state, reg, state.registers(reg) + value)
   }

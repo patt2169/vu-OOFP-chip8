@@ -15,7 +15,7 @@ import chip.logic.ChipRomReader
 
 class main extends ChipBase {
 
-  var chipLogic = new ChipLogic(ChipLogic.DefaultGridDims)
+  val chipLogic = new ChipLogic(ChipLogic.DefaultGridDims)
   val instructionTimer = new UpdateTimer(ChipLogic.InstructionsPerSecond.toFloat)
   val timerDecTimer = new UpdateTimer(ChipLogic.TimerDecrementsPerSecond.toFloat)
   val gridDimensions : Dimensions =  chipLogic.gridDims
@@ -46,7 +46,7 @@ class main extends ChipBase {
     }
 
     for (p <- gridDimensions.allPointsInside) {
-      val color = if (chipLogic.getCellState(p)) Green else Black
+      val color: Color = if (chipLogic.getCellState(p)) Green else Black
       drawCell(getCell(p), color)
     }
 

@@ -3,7 +3,6 @@ package chip.logic
 import chip.logic.handlers.DisplayHandlers._
 import chip.logic.handlers.RegisterHandlers._
 import chip.logic.handlers.ControlFlowHandlers._
-import chip.logic.handlers.TimerHandlers._
 
 object InstructionExecuter {
     def execute(state: ChipState, instruction: Instruction): ChipState = {
@@ -22,7 +21,7 @@ object InstructionExecuter {
             case AddRegister(reg, nn) =>
                 handleAddRegister(state, reg, nn)
             case SetIndex(nnn) =>
-                state.copy(indexRegister = nnn)
+                handleSetIndex(state, nnn)
             case DrawSprite(xReg, yReg, n) =>
                 handleDrawSprite(state, xReg, yReg, n)
             case CallSubroutine(nnn) =>
