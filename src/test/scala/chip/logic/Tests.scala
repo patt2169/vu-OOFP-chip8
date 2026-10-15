@@ -29,6 +29,17 @@ class Tests {
   }
 
   @Test
+  def initialStateContainsTheBuiltInFontAtTheConfiguredAddress(): Unit = {
+    val font = initialState.memory.slice(
+      ChipLogic.FontStartAddress,
+      ChipLogic.FontStartAddress + ChipLogic.FontData.length
+    )
+
+    assertEquals(80, ChipLogic.FontData.length)
+    assertEquals(ChipLogic.FontData, font)
+  }
+
+  @Test
   def steppingSetImmediateUpdatesRegisterAndProgramCounter(): Unit = {
     val result = stateWithProgram(0x62AB).step()
 

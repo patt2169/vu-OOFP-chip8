@@ -13,7 +13,7 @@ object ChipRomReader {
             }
 
             val memory = romBytes.zipWithIndex.foldLeft(
-                Vector.fill(ChipLogic.MemorySize)(0)
+                ChipLogic.InitialMemory
             ) {
                 case (currentMemory, (byte, index)) =>
                     currentMemory.updated(

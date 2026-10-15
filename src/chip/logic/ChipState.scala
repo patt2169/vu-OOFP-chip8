@@ -6,7 +6,7 @@ case class ChipState(
     //      make constraints obvious in types
     gridDims: Dimensions,
     stopExecution: Boolean = false,
-    memory: Vector[Int] = Vector.fill(ChipLogic.MemorySize)(0),
+    memory: Vector[Int] = ChipLogic.InitialMemory,
     display: Vector[Vector[Boolean]],
     programCounter: Int = ChipLogic.ProgramStartAddress,
     indexRegister: Int = 0,
