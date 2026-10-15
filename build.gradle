@@ -32,6 +32,7 @@ repositories {
 }
 
 sourceSets.main.scala.srcDirs = ['src']
+sourceSets.main.scala.exclude 'test/**'
 
 dependencies {
     implementation("org.processing:core:4.4.4")

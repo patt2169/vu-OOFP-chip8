@@ -1,5 +1,7 @@
 package chip.logic
 
+import scala.util.Random
+
 object InstructionDecoder {
     def decode(opcode: Int): Instruction = {
         val nibble1 = (opcode & 0xF000) >> 12
@@ -38,7 +40,22 @@ object InstructionDecoder {
             
             case 0x9 => SkipNotEqualsReg(xReg, yReg)
             case 0xA => SetIndex(nnn)
+            case 0xB => JumpWithOffset(nnn)
+            case 0xC => GetRandom(xReg, nn)
             case 0xD => DrawSprite(xReg, yReg, n)
+            case 0xE => nn match {
+                case 0x9E => SkipIfKeyPressed(xReg)
+                case 0xA1 => SkipIfKeyNotPressed(xReg)
+                case _    => UnsupportedOpcode(opcode)
+            }
+            case 0xF => nn match {
+                case 0x07 => GetDelayTimer(xReg)
+                case 0x15 => SetDelayTimer(xReg)
+                case 0x18 => SetSoundTimer(xReg)
+                case 0x1E => AddIndexRegister(xReg)
+                case 0x0A => GetKey(xReg)
+                case _    => UnsupportedOpcode(opcode)
+            }
             
             case _ => UnsupportedOpcode(opcode)
         }

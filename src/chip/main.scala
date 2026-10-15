@@ -56,16 +56,35 @@ class main extends ChipBase {
    * You may add extra functionality for other keys here.
    * See [[event.KeyEvent]] for all defined keycodes.
    */
-  override def keyPressed(event: KeyEvent): Unit = { //TODO: implement key handling
-    event.getKeyCode match {
-      case _ => ()
+  private def updateChip8Key(event: KeyEvent, pressed: Boolean): Unit = {
+    val chip8Key = event.getKeyCode match {
+      case VK_1 => Some(0x1)
+      case VK_2 => Some(0x2)
+      case VK_3 => Some(0x3)
+      case VK_4 => Some(0xC)
+      case VK_Q => Some(0x4)
+      case VK_W => Some(0x5)
+      case VK_E => Some(0x6)
+      case VK_R => Some(0xD)
+      case VK_A => Some(0x7)
+      case VK_S => Some(0x8)
+      case VK_D => Some(0x9)
+      case VK_F => Some(0xE)
+      case VK_Z => Some(0xA)
+      case VK_X => Some(0x0)
+      case VK_C => Some(0xB)
+      case VK_V => Some(0xF)
+      case _    => None
     }
+    chip8Key.foreach(key => chipLogic.setKeyPressed(key, pressed))
+  }
+
+  override def keyPressed(event: KeyEvent): Unit = {
+    updateChip8Key(event, pressed = true)
   }
 
   override def keyReleased(event: KeyEvent): Unit = {
-    event.getKeyCode match {
-      case _    => ()
-    }
+    updateChip8Key(event, pressed = false)
   }
 
   override def settings(): Unit = {
@@ -75,7 +94,7 @@ class main extends ChipBase {
   }
 
   override def setup(): Unit = {
-    chipLogic.loadROM("ROMs\\IbmLogo.ch8")
+    chipLogic.loadROM("ROMs/test_opcode.ch8")
     
     // Loads fonts used for window drawing (not the ones in memory)
     text("", 0, 0)
@@ -91,7 +110,7 @@ class main extends ChipBase {
       instructionTimer.advanceFrame()
     }
     if (timerDecTimer.timeForNextFrame()) {
-      //chipLogic.decrementTimers()
+      chipLogic.decrementTimers()
       timerDecTimer.advanceFrame()
     }
   }

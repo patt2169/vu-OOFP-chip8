@@ -5,11 +5,19 @@ class ChipLogic(val gridDims: Dimensions) {
 
   var curChipState: ChipState = ChipState.initial(gridDims)
 
-  def step(): Unit = { curChipState = curChipState.step() }
+  def step(): Unit = {
+    if (curChipState.stopExecution == false)
+      curChipState = curChipState.step() 
+  }
 
   def decrementTimers(): Unit = { curChipState = curChipState.decrementTimers() }
 
   def loadROM(path: String): Unit = { curChipState = curChipState.loadROM(path) }
+
+  def setKeyPressed(key: Int, pressed: Boolean): Unit = {
+    require(key >= 0 && key < ChipLogic.KeyCount, "CHIP-8 key must be between 0 and 15")
+    curChipState = curChipState.copy(keypad = curChipState.keypad.updated(key, pressed))
+  }
 
   def getCellState(p: Point): Boolean = {
     require(
@@ -25,6 +33,7 @@ object ChipLogic {
   val TimerDecrementsPerSecond: Int = 60
   val MemorySize: Int = 4096
   val RegisterCount: Int = 16
+  val KeyCount: Int = 16
   val FlagRegisterIndex: Int = 0xf
   val ProgramStartAddress: Int = 0x200
 

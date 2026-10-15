@@ -1,6 +1,7 @@
 package chip.logic.handlers
 
 import chip.logic.{ChipLogic, ChipState}
+import scala.util.Random
 
 object RegisterHandlers {
   def handleSetRegister(state: ChipState, reg: Int, value: Int): ChipState = {
@@ -41,6 +42,20 @@ object RegisterHandlers {
   def handleShiftLeftRegister(state: ChipState, xReg: Int): ChipState = {
     val value = state.registers(xReg)
     shiftRegister(state, xReg, (value << 1) & 0xff, (value >> 7) & 0x01)
+  }
+  def handleGetRandom(state: ChipState, xReg: Int, nn: Int): ChipState = {
+    handleSetRegister(state, xReg, Random.nextInt(0x100) & nn)
+  }
+  def handleAddIndexRegister(state: ChipState, xReg: Int): ChipState = {
+    val sum = state.indexRegister + state.registers(xReg)
+    val newRegisters = state.registers.updated(
+      ChipLogic.FlagRegisterIndex,
+      if (sum >= ChipLogic.MemorySize) 1 else 0
+    )
+    state.copy(
+      indexRegister = sum % ChipLogic.MemorySize, // Ensure Index doesnt go out of bounds (TODO: Is this the way to go?)
+      registers = newRegisters
+    )
   }
 
   private def subtractRegisters(

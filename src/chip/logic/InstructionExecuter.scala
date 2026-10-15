@@ -3,14 +3,20 @@ package chip.logic
 import chip.logic.handlers.DisplayHandlers._
 import chip.logic.handlers.RegisterHandlers._
 import chip.logic.handlers.ControlFlowHandlers._
+import chip.logic.handlers.TimerHandlers._
 
 object InstructionExecuter {
     def execute(state: ChipState, instruction: Instruction): ChipState = {
         instruction match {
+            case e: DecodeError => 
+                println("Error instruction in Executer: " + e.toString())
+                state.copy(stopExecution = true)
             case ClearScreen =>
                 handleClearScreen(state)
             case Jump(nnn) =>
                 handleJump(state, nnn)
+            case JumpWithOffset(nnn) =>
+                handleJumpWithOffset(state, nnn)
             case SetRegister(reg, nn) =>
                 handleSetRegister(state, reg, nn)
             case AddRegister(reg, nn) =>
@@ -31,6 +37,10 @@ object InstructionExecuter {
                 handleSkipEqualsReg(state, xReg, yReg)
             case SkipNotEqualsReg(xReg, yReg) =>
                 handleSkipNotEqualsReg(state, xReg, yReg)
+            case SkipIfKeyPressed(xReg) =>
+                handleSkipIfKeyPressed(state, xReg)
+            case SkipIfKeyNotPressed(xReg) =>
+                handleSkipIfKeyNotPressed(state, xReg)
             case SetRegisterReg(xReg, yReg) =>
                 handleSetRegisterReg(state, xReg, yReg)
             case OrRegister(xReg, yReg) =>
@@ -49,6 +59,18 @@ object InstructionExecuter {
                 handleShiftRightRegister(state, xReg)
             case ShiftLeftRegister(xReg) =>
                 handleShiftLeftRegister(state, xReg)
+            case GetRandom(xReg, nn) => 
+                handleGetRandom(state, xReg, nn)
+            case GetDelayTimer(xReg) =>
+                handleGetDelayTimer(state, xReg)
+            case SetDelayTimer(xReg) =>
+                handleSetDelayTimer(state, xReg)
+            case SetSoundTimer(xReg) =>
+                handleSetSoundTimer(state, xReg)
+            case AddIndexRegister(xReg) =>
+                handleAddIndexRegister(state, xReg)
+            case GetKey(xReg) =>
+                handleGetKey(state, xReg)
         }
     }
 }

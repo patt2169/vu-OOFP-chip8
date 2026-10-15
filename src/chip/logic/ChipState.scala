@@ -5,6 +5,7 @@ case class ChipState(
     // TODO: consider changing Ints to more specific
     //      make constraints obvious in types
     gridDims: Dimensions,
+    stopExecution: Boolean = false,
     memory: Vector[Int] = Vector.fill(ChipLogic.MemorySize)(0),
     display: Vector[Vector[Boolean]],
     programCounter: Int = ChipLogic.ProgramStartAddress,
@@ -12,7 +13,8 @@ case class ChipState(
     stack: List[Int] = List.empty,
     delayTimer: Int = 0,
     soundTimer: Int = 0,
-    registers: Vector[Int] = Vector.fill(ChipLogic.RegisterCount)(0)
+    registers: Vector[Int] = Vector.fill(ChipLogic.RegisterCount)(0),
+    keypad: Vector[Boolean] = Vector.fill(ChipLogic.KeyCount)(false)
 ) {
     require(memory.length == ChipLogic.MemorySize, "CHIP-8 memory must contain 4096 bytes")
     require(memory.forall(byte => byte >= 0 && byte <= 0xff), "Memory values must be bytes")
@@ -25,6 +27,7 @@ case class ChipState(
     require(isByte(soundTimer), "Sound timer must be an 8-bit value")
     require(registers.length == ChipLogic.RegisterCount, "CHIP-8 must have 16 variable registers")
     require(registers.forall(isByte), "Register values must be bytes")
+    require(keypad.length == ChipLogic.KeyCount, "CHIP-8 keypad must contain 16 keys")
 
     def flagRegister: Int = registers(ChipLogic.FlagRegisterIndex)
 
@@ -32,7 +35,10 @@ case class ChipState(
     private def isByte(value: Int): Boolean = value >= 0 && value <= 0xff
 
     def decrementTimers(): ChipState = {
-        this.copy(delayTimer = delayTimer - 1, soundTimer = soundTimer - 1)
+        this.copy(
+            delayTimer = (delayTimer - 1).max(0),
+            soundTimer = (soundTimer - 1).max(0)
+        )
     }
 
     def loadROM(path: String): ChipState = {
@@ -45,6 +51,7 @@ case class ChipState(
 
         val opcode = (memory(programCounter) << 8) | memory(programCounter + 1)
         val instruction = InstructionDecoder.decode(opcode)
+        
         val stateWithAdvancedProgramCounter =
             copy(programCounter = programCounter + 2)
 
