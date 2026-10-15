@@ -6,9 +6,10 @@ import chip.logic.handlers.RegisterHandlers
 
 case class ChipState(
     // TODO: consider changing Ints to more specific
-    //      make constraints obvious in types
+    //       make constraints obvious in types
     gridDims: Dimensions,
     stopExecution: Boolean = false,
+    pastChipStates: List[ChipState] = List.empty,
     memory: Vector[Int] = ChipLogic.InitialMemory,
     display: Vector[Vector[Boolean]],
     programCounter: Int = ChipLogic.ProgramStartAddress,
@@ -52,14 +53,19 @@ case class ChipState(
         require(isValidAddress(programCounter + 1), 
                 "Program counter must point to a complete instruction in memory")
 
+        val newPastStates = this :: pastChipStates
+
         val opcode = (memory(programCounter) << 8) | memory(programCounter + 1)
         val instruction = InstructionDecoder.decode(opcode)
         
         val stateWithAdvancedProgramCounter =
             copy(programCounter = programCounter + 2)
 
-        InstructionExecuter.execute(stateWithAdvancedProgramCounter, instruction)
+        val executedState = InstructionExecuter.execute(stateWithAdvancedProgramCounter, instruction)
+        executedState.copy(pastChipStates = newPastStates)
     }
+
+    def rewind(): ChipState = { pastChipStates.head }
 }
 
 object ChipState {

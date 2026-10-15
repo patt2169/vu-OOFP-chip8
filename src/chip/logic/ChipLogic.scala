@@ -7,7 +7,11 @@ class ChipLogic(val gridDims: Dimensions) {
 
   def step(): Unit = {
     if (curChipState.stopExecution == false)
-      curChipState = curChipState.step() 
+      curChipState = curChipState.step()
+  }
+
+  def rewind(): Unit = {
+    curChipState = curChipState.rewind()
   }
 
   def decrementTimers(): Unit = { curChipState = curChipState.decrementTimers() }

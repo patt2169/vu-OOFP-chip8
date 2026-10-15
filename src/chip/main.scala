@@ -15,6 +15,8 @@ import chip.logic.ChipRomReader
 
 class main extends ChipBase {
 
+  var reversing: Boolean = false
+
   val chipLogic = new ChipLogic(ChipLogic.DefaultGridDims)
   val instructionTimer = new UpdateTimer(ChipLogic.InstructionsPerSecond.toFloat)
   val timerDecTimer = new UpdateTimer(ChipLogic.TimerDecrementsPerSecond.toFloat)
@@ -74,6 +76,10 @@ class main extends ChipBase {
       case VK_X => Some(0x0)
       case VK_C => Some(0xB)
       case VK_V => Some(0xF)
+      case VK_SPACE => { // TODO: questionable
+        reversing = pressed
+        None
+      }
       case _    => None
     }
     chip8Key.foreach(key => chipLogic.setKeyPressed(key, pressed))
@@ -106,7 +112,10 @@ class main extends ChipBase {
 
   def updateState(): Unit = {
     if (instructionTimer.timeForNextFrame()) {
-      chipLogic.step()
+      if (!reversing)
+        chipLogic.step()
+      else
+        chipLogic.rewind()
       instructionTimer.advanceFrame()
     }
     if (timerDecTimer.timeForNextFrame()) {
