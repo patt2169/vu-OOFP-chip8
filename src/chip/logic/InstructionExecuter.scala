@@ -71,6 +71,10 @@ object InstructionExecuter {
                 handleAddIndexRegister(state, xReg)
             case GetKey(xReg) =>
                 handleGetKey(state, xReg)
+            case SetIndexToFontCharacter(xReg) =>
+                handleSetIndexToFontCharacter(state, xReg)
+            case StoreBCD(xReg) =>
+                handleStoreBCD(state, xReg)
         }
     }
 }

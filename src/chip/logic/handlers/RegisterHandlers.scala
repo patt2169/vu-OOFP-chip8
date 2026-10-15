@@ -57,6 +57,18 @@ object RegisterHandlers {
       registers = newRegisters
     )
   }
+  def handleSetIndexToFontCharacter(state: ChipState, xReg: Int): ChipState = {
+    state.copy(indexRegister = ChipLogic.FontStartAddress + state.registers(xReg) * 5)
+  }
+  def handleStoreBCD(state: ChipState, xReg: Int): ChipState = {
+    require(
+      state.indexRegister + 2 < state.memory.length,
+      "BCD digits must fit in memory"
+    )
+    val value = state.registers(xReg)
+    val digits = Vector(value / 100, (value / 10) % 10, value % 10)
+    state.copy(memory = state.memory.patch(state.indexRegister, digits, digits.length))
+  }
 
   private def subtractRegisters(
       state: ChipState,

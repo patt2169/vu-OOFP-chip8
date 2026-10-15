@@ -54,6 +54,8 @@ object InstructionDecoder {
                 case 0x18 => SetSoundTimer(xReg)
                 case 0x1E => AddIndexRegister(xReg)
                 case 0x0A => GetKey(xReg)
+                case 0x29 => SetIndexToFontCharacter(xReg)
+                case 0x33 => StoreBCD(xReg)
                 case _    => UnsupportedOpcode(opcode)
             }
             

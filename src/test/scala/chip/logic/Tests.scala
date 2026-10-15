@@ -40,6 +40,42 @@ class Tests {
   }
 
   @Test
+  def fontCharacterInstructionSetsIndexToGlyphAddress(): Unit = {
+    val state = stateWithProgram(0xF229).copy(
+      registers = initialState.registers.updated(2, 0xA)
+    )
+
+    val result = state.step()
+
+    assertEquals(ChipLogic.FontStartAddress + 0xA * 5, result.indexRegister)
+  }
+
+  @Test
+  def bcdInstructionStoresThreeDecimalDigits(): Unit = {
+    val state = stateWithProgram(0xF233).copy(
+      indexRegister = 0x300,
+      registers = initialState.registers.updated(2, 156)
+    )
+
+    val result = state.step()
+
+    assertEquals(Vector(1, 5, 6), result.memory.slice(0x300, 0x303))
+    assertEquals(0x300, result.indexRegister)
+  }
+
+  @Test
+  def bcdInstructionStoresLeadingZeroForSmallValues(): Unit = {
+    val state = stateWithProgram(0xF033).copy(
+      indexRegister = 0x300,
+      registers = initialState.registers.updated(0, 7)
+    )
+
+    val result = state.step()
+
+    assertEquals(Vector(0, 0, 7), result.memory.slice(0x300, 0x303))
+  }
+
+  @Test
   def steppingSetImmediateUpdatesRegisterAndProgramCounter(): Unit = {
     val result = stateWithProgram(0x62AB).step()
 
