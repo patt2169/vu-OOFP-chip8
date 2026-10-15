@@ -1,4 +1,3 @@
-// scalastyle:off
 package chip
 
 import java.awt.event
@@ -111,14 +110,13 @@ class main extends ChipBase {
 
 
   def updateState(): Unit = {
-    if (instructionTimer.timeForNextFrame()) {
-      if (!reversing)
-        chipLogic.step()
-      else
-        chipLogic.rewind()
+    while (instructionTimer.timeForNextFrame()) {
+      if (!reversing) chipLogic.step()
+      else chipLogic.rewind()
+
       instructionTimer.advanceFrame()
     }
-    if (timerDecTimer.timeForNextFrame()) {
+    while (timerDecTimer.timeForNextFrame()) {
       chipLogic.decrementTimers()
       timerDecTimer.advanceFrame()
     }

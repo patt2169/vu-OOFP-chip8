@@ -11,8 +11,8 @@ class ChipBase extends PApplet {
   // inner class: can call current time of outer class
   class UpdateTimer(val framesPerSecond: Float) {
 
-    val frameDuration: Float = 1000 / framesPerSecond // ms
-    var nextFrame: Float = Float.MaxValue
+    val frameDuration: Long = math.round(1_000_000_000.0 / framesPerSecond)
+    var nextFrame: Long = Long.MaxValue
 
     def init(): Unit = nextFrame = currentTime() + frameDuration
     def timeForNextFrame(): Boolean = currentTime() >= nextFrame
@@ -22,11 +22,11 @@ class ChipBase extends PApplet {
 
   // ===Processing Wrappers & Abstractions===
 
-  /** An alias for the obscurely named function millis()
+  /** Returns the current monotonic time in nanoseconds.
     *
-    * @return Current time in milliseconds since stating the program.
+    * @return Current time in nanoseconds from an arbitrary origin.
     */
-  def currentTime(): Int = millis()
+  def currentTime(): Long = System.nanoTime()
 
   def drawTextCentered(string: String, size: Float, center: Point): Unit = {
     val (x, y) = (center.x, center.y-(size/2))

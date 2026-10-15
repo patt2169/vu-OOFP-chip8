@@ -65,7 +65,12 @@ case class ChipState(
         executedState.copy(pastChipStates = newPastStates)
     }
 
-    def rewind(): ChipState = { pastChipStates.head }
+    def rewind(): ChipState = {
+        if (pastChipStates.nonEmpty)
+            pastChipStates.head
+        else
+            this
+    }
 }
 
 object ChipState {
