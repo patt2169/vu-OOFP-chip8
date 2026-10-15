@@ -56,6 +56,8 @@ object InstructionDecoder {
                 case 0x0A => GetKey(xReg)
                 case 0x29 => SetIndexToFontCharacter(xReg)
                 case 0x33 => StoreBCD(xReg)
+                case 0x55 => StoreRegisters(xReg)
+                case 0x65 => LoadRegisters(xReg)
                 case _    => UnsupportedOpcode(opcode)
             }
             

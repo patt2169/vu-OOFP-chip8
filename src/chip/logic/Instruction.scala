@@ -34,6 +34,8 @@ case class AddIndexRegister(xReg: Int) extends Instruction
 case class GetKey(xReg: Int) extends Instruction
 case class SetIndexToFontCharacter(xReg: Int) extends Instruction
 case class StoreBCD(xReg: Int) extends Instruction
+case class StoreRegisters(xReg: Int) extends Instruction
+case class LoadRegisters(xReg: Int) extends Instruction
 
 sealed trait DecodeError extends Instruction 
 case class UnsupportedOpcode(opcode: Int) extends DecodeError {

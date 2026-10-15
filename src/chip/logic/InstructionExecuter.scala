@@ -75,6 +75,10 @@ object InstructionExecuter {
                 handleSetIndexToFontCharacter(state, xReg)
             case StoreBCD(xReg) =>
                 handleStoreBCD(state, xReg)
+            case StoreRegisters(xReg) =>
+                handleStoreRegisters(state, xReg)
+            case LoadRegisters(xReg) =>
+                handleLoadRegisters(state, xReg)
         }
     }
 }

@@ -76,6 +76,90 @@ class Tests {
   }
 
   @Test
+  def storeRegistersWritesV0ThroughVXAtIndexAddress(): Unit = {
+    val registers = initialState.registers
+      .updated(0, 0x12)
+      .updated(1, 0x34)
+      .updated(2, 0x56)
+      .updated(3, 0x78)
+    val state = stateWithProgram(0xF355).copy(
+      indexRegister = 0x300,
+      registers = registers
+    )
+
+    val result = state.step()
+
+    assertEquals(Vector(0x12, 0x34, 0x56, 0x78), result.memory.slice(0x300, 0x304))
+    assertEquals(0x300, result.indexRegister)
+  }
+
+  @Test
+  def storeRegistersWithXZeroStoresOnlyV0(): Unit = {
+    val state = stateWithProgram(0xF055).copy(
+      indexRegister = 0x300,
+      registers = initialState.registers.updated(0, 0xAB).updated(1, 0xCD)
+    )
+
+    val result = state.step()
+
+    assertEquals(Vector(0xAB), result.memory.slice(0x300, 0x301))
+    assertEquals(0, result.memory(0x301))
+  }
+
+  @Test
+  def loadRegistersReadsV0ThroughVXFromIndexAddress(): Unit = {
+    val programState = stateWithProgram(0xF265)
+    val state = programState.copy(
+      indexRegister = 0x300,
+      memory = programState.memory.patch(0x300, Vector(0x12, 0x34, 0x56), 3),
+      registers = initialState.registers.updated(3, 0xFF)
+    )
+
+    val result = state.step()
+
+    assertEquals(Vector(0x12, 0x34, 0x56), result.registers.take(3))
+    assertEquals(0xFF, result.registers(3))
+    assertEquals(0x300, result.indexRegister)
+  }
+
+  @Test
+  def loadRegistersWithXZeroLoadsOnlyV0(): Unit = {
+    val programState = stateWithProgram(0xF065)
+    val state = programState.copy(
+      indexRegister = 0x300,
+      memory = programState.memory.updated(0x300, 0xAB),
+      registers = initialState.registers.updated(0, 0x12).updated(1, 0x34)
+    )
+
+    val result = state.step()
+
+    assertEquals(0xAB, result.registers(0))
+    assertEquals(0x34, result.registers(1))
+  }
+
+  @Test
+  def registerMemoryInstructionsRejectRangesPastMemory(): Unit = {
+    val storeState = stateWithProgram(0xF155).copy(indexRegister = ChipLogic.MemorySize - 1)
+    val loadState = stateWithProgram(0xF165).copy(indexRegister = ChipLogic.MemorySize - 1)
+
+    try {
+      storeState.step()
+      fail("Expected FX55 to reject a register range extending past memory")
+    } catch {
+      case error: IllegalArgumentException =>
+        assertEquals("requirement failed: Registers must fit in memory", error.getMessage)
+    }
+
+    try {
+      loadState.step()
+      fail("Expected FX65 to reject a register range extending past memory")
+    } catch {
+      case error: IllegalArgumentException =>
+        assertEquals("requirement failed: Registers must fit in memory", error.getMessage)
+    }
+  }
+
+  @Test
   def steppingSetImmediateUpdatesRegisterAndProgramCounter(): Unit = {
     val result = stateWithProgram(0x62AB).step()
 

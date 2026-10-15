@@ -69,6 +69,24 @@ object RegisterHandlers {
     val digits = Vector(value / 100, (value / 10) % 10, value % 10)
     state.copy(memory = state.memory.patch(state.indexRegister, digits, digits.length))
   }
+  def handleStoreRegisters(state: ChipState, xReg: Int): ChipState = {
+    val registerCount = xReg + 1
+    require(
+      state.indexRegister + registerCount <= state.memory.length,
+      "Registers must fit in memory"
+    )
+    val values = state.registers.take(registerCount)
+    state.copy(memory = state.memory.patch(state.indexRegister, values, values.length))
+  }
+  def handleLoadRegisters(state: ChipState, xReg: Int): ChipState = {
+    val registerCount = xReg + 1
+    require(
+      state.indexRegister + registerCount <= state.memory.length,
+      "Registers must fit in memory"
+    )
+    val values = state.memory.slice(state.indexRegister, state.indexRegister + registerCount)
+    state.copy(registers = state.registers.patch(0, values, values.length))
+  }
 
   private def subtractRegisters(
       state: ChipState,

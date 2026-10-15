@@ -94,7 +94,7 @@ class main extends ChipBase {
   }
 
   override def setup(): Unit = {
-    chipLogic.loadROM("ROMs/test_opcode.ch8")
+    chipLogic.loadROM("ROMs/tetris.ch8")
     
     // Loads fonts used for window drawing (not the ones in memory)
     text("", 0, 0)
