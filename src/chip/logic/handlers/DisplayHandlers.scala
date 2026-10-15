@@ -20,25 +20,13 @@ trait DisplayHandlers {
         val visibleRows = math.min(n, gridDims.height - startY)
         val (updatedDisplay, collision) =
             (0 until visibleRows).foldLeft((display, false)) {
-                case ((display, hadCollision), rowOffset) =>
+                case ((currentDisplay, hadCollision), rowOffset) =>
                     val spriteByte = memory(indexRegister + rowOffset)
                     val screenY = startY + rowOffset
+                    val (updatedDisplay, rowCollision) =
+                        drawSpriteRow(currentDisplay, spriteByte, screenY, startX)
 
-                    val visibleCols = math.min(8, gridDims.width - startX)
-                    (0 until visibleCols).foldLeft((display, hadCollision)) {
-                        case ((currentDisplay, rowCollision), bitOffset) =>
-                            val screenX = startX + bitOffset
-                            val spritePixel = (spriteByte & (0x80 >> bitOffset)) != 0
-
-                            if (spritePixel) {
-                                val wasOn = currentDisplay(screenY)(screenX)
-                                val updatedRow = currentDisplay(screenY).updated(screenX, !wasOn)
-                                val newDisplay = currentDisplay.updated(screenY, updatedRow)
-                                (newDisplay, rowCollision || wasOn)
-                            } else {
-                                (currentDisplay, rowCollision)
-                            }
-                    }
+                    (updatedDisplay, hadCollision || rowCollision)
             }
 
         val updatedRegisters: Vector[Int] = registers.updated(
@@ -46,5 +34,30 @@ trait DisplayHandlers {
             if(collision) 1 else 0
         )
         copy(display = updatedDisplay, registers = updatedRegisters)
+    }
+    
+    private def drawSpriteRow(
+        currentDisplay: Vector[Vector[Boolean]],
+        spriteByte: Int,
+        screenY: Int,
+        startX: Int
+    ): (Vector[Vector[Boolean]], Boolean) = {
+        val visibleCols = math.min(8, gridDims.width - startX)
+
+        (0 until visibleCols).foldLeft((currentDisplay, false)) {
+            case ((rowDisplay, rowCollision), bitOffset) =>
+                val spritePixel = (spriteByte & (0x80 >> bitOffset)) != 0
+
+                if (!spritePixel) {
+                    (rowDisplay, rowCollision)
+                } else {
+                    val screenX = startX + bitOffset
+                    val wasOn = rowDisplay(screenY)(screenX)
+                    val updatedRow = rowDisplay(screenY).updated(screenX, !wasOn)
+                    val updatedDisplay = rowDisplay.updated(screenY, updatedRow)
+
+                    (updatedDisplay, rowCollision || wasOn)
+                }
+        }
     }
 }
