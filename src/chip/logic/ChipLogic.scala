@@ -1,6 +1,17 @@
 package chip.logic
 import chip.helpers._
 
+case class ChipStatus(
+    programCounter: Int,
+    opcode: Option[Int],
+    instruction: Option[Instruction],
+    registers: Vector[Int],
+    delayTimer: Int,
+    soundTimer: Int,
+    executionStopped: Boolean,
+    fault: Option[String]
+)
+
 class ChipLogic(val gridDims: Dimensions) {
 
   private var curChipState: ChipState = ChipState.initial(gridDims)
@@ -15,7 +26,11 @@ class ChipLogic(val gridDims: Dimensions) {
 
   def decrementTimers(): Unit = { curChipState = curChipState.decrementTimers() }
 
-  def loadROM(path: String): Unit = { curChipState = curChipState.loadROM(path) }
+  def reset(): Unit = { curChipState = ChipState.initial(gridDims) }
+
+  def loadROM(path: String): Unit = {
+    curChipState = ChipState.initial(gridDims).loadROM(path)
+  }
 
   def setKeyPressed(key: Int, pressed: Boolean): Unit = {
     require(key >= 0 && key < ChipLogic.KeyCount, "CHIP-8 key must be between 0 and 15")
@@ -31,6 +46,33 @@ class ChipLogic(val gridDims: Dimensions) {
   }
 
   def executionStopped(): Boolean = curChipState.stopExecution
+
+  def status: ChipStatus = {
+    val statusProgramCounter =
+      if (curChipState.fault.nonEmpty) curChipState.programCounter - 2
+      else curChipState.programCounter
+    val opcode =
+      if (statusProgramCounter >= 0 &&
+          statusProgramCounter + 1 < curChipState.memory.length) {
+        Some(
+          (curChipState.memory(statusProgramCounter) << 8) |
+            curChipState.memory(statusProgramCounter + 1)
+        )
+      } else {
+        None
+      }
+
+    ChipStatus(
+      programCounter = statusProgramCounter,
+      opcode = opcode,
+      instruction = opcode.map(InstructionDecoder.decode),
+      registers = curChipState.registers,
+      delayTimer = curChipState.delayTimer,
+      soundTimer = curChipState.soundTimer,
+      executionStopped = curChipState.stopExecution,
+      fault = curChipState.fault
+    )
+  }
 }
 
 object ChipLogic {

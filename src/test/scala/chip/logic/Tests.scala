@@ -4,6 +4,8 @@ import chip.helpers.Dimensions
 import org.junit.Assert._
 import org.junit.Test
 
+import java.nio.file.Files
+
 class Tests {
   private def initialState: ChipState =
     ChipState.initial(Dimensions(width = 64, height = 32))
@@ -194,5 +196,54 @@ class Tests {
 
     assertEquals(0, result.delayTimer)
     assertEquals(0, result.soundTimer)
+  }
+
+  @Test
+  def chipLogicStatusShowsTheCurrentInstructionAndFault(): Unit = {
+    val logic = new ChipLogic(Dimensions(width = 64, height = 32))
+
+    val initialStatus = logic.status
+    assertEquals(ChipLogic.ProgramStartAddress, initialStatus.programCounter)
+    assertEquals(Some(0), initialStatus.opcode)
+    assertEquals(Some(UnsupportedOpcode(0)), initialStatus.instruction)
+    assertFalse(initialStatus.executionStopped)
+
+    logic.step()
+
+    val faultStatus = logic.status
+    assertTrue(faultStatus.executionStopped)
+    assertEquals(Some("UnsupportedOpcode: 0x0"), faultStatus.fault)
+    assertEquals(ChipLogic.ProgramStartAddress, faultStatus.programCounter)
+  }
+
+  @Test
+  def resetClearsMachineStateAndFault(): Unit = {
+    val logic = new ChipLogic(Dimensions(width = 64, height = 32))
+    logic.step()
+
+    logic.reset()
+
+    assertEquals(ChipLogic.ProgramStartAddress, logic.status.programCounter)
+    assertEquals(None, logic.status.fault)
+    assertFalse(logic.status.executionStopped)
+    assertEquals(Vector.fill(ChipLogic.RegisterCount)(0), logic.status.registers)
+  }
+
+  @Test
+  def loadingROMStartsFromFreshMachineState(): Unit = {
+    val rom = Files.createTempFile("chip8-test", ".ch8")
+    try {
+      Files.write(rom, Array[Byte](0x60, 0xAB.toByte))
+      val logic = new ChipLogic(Dimensions(width = 64, height = 32))
+      logic.step()
+      logic.loadROM(rom.toString)
+
+      assertEquals(ChipLogic.ProgramStartAddress, logic.status.programCounter)
+      assertEquals(Some(0x60AB), logic.status.opcode)
+      assertEquals(Vector.fill(ChipLogic.RegisterCount)(0), logic.status.registers)
+      assertFalse(logic.status.executionStopped)
+    } finally {
+      Files.deleteIfExists(rom)
+    }
   }
 }

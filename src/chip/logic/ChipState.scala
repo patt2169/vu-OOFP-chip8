@@ -17,6 +17,7 @@ case class ChipState(
     stack: List[Int] = List.empty,
     delayTimer: Int = 0,
     soundTimer: Int = 0,
+    fault: Option[String] = None,
     registers: Vector[Int] = Vector.fill(ChipLogic.RegisterCount)(0),
     keypad: Vector[Boolean] = Vector.fill(ChipLogic.KeyCount)(false)
 ) extends ControlFlowOps with RegisterHandlers with DisplayHandlers {
@@ -50,19 +51,20 @@ case class ChipState(
     }
 
     def step(): ChipState = {
+        if (stopExecution) return this
+
         require(isValidAddress(programCounter + 1), 
                 "Program counter must point to a complete instruction in memory")
-        if (stopExecution) this
 
         val newPastStates = this :: pastChipStates
 
         val opcode = (memory(programCounter) << 8) | memory(programCounter + 1)
         val instruction = InstructionDecoder.decode(opcode)
-        
+
         val stateWithAdvancedProgramCounter =
             copy(programCounter = programCounter + 2)
-
-        val executedState = InstructionExecuter.execute(stateWithAdvancedProgramCounter, instruction)
+        val executedState =
+            InstructionExecuter.execute(stateWithAdvancedProgramCounter, instruction)
         executedState.copy(pastChipStates = newPastStates)
     }
 
