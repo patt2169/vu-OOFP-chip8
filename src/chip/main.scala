@@ -12,7 +12,7 @@ import chip.helpers.{Dimensions, Point => GridPoint}
 import engine.graphics.Color._
 import chip.logic.ChipRomReader
 
-class main extends ChipBase {
+class Main extends ChipBase {
 
   var reversing: Boolean = false
 
@@ -20,8 +20,8 @@ class main extends ChipBase {
   val instructionTimer = new UpdateTimer(ChipLogic.InstructionsPerSecond.toFloat)
   val timerDecTimer = new UpdateTimer(ChipLogic.TimerDecrementsPerSecond.toFloat)
   val gridDimensions : Dimensions =  chipLogic.gridDims
-  val widthInPixels: Int = (main.WidthCellInPixels * gridDimensions.width).ceil.toInt
-  val heightInPixels: Int = (main.HeightCellInPixels * gridDimensions.height).ceil.toInt
+  val widthInPixels: Int = (Chip8App.WidthCellInPixels * gridDimensions.width).ceil.toInt
+  val heightInPixels: Int = (Chip8App.HeightCellInPixels * gridDimensions.height).ceil.toInt
   val screenArea: Rectangle = Rectangle(Point(0, 0), widthInPixels.toFloat, heightInPixels.toFloat)
 
   // this function is wrongly named draw by processing (is called on each update next to drawing)
@@ -51,12 +51,14 @@ class main extends ChipBase {
       drawCell(getCell(p), color)
     }
 
+    if (chipLogic.executionStopped()) drawExecutionStopped()
   }
 
-  /** Method that calls handlers for different key press events.
-   * You may add extra functionality for other keys here.
-   * See [[event.KeyEvent]] for all defined keycodes.
-   */
+  private def drawExecutionStopped(): Unit = {
+    setFillColor(Red)
+    drawTextCentered("Execution Stopped", 20, screenArea.center)
+  }
+
   private def updateChip8Key(event: KeyEvent, pressed: Boolean): Unit = {
     val chip8Key = event.getKeyCode match {
       case VK_1 => Some(0x1)
@@ -99,7 +101,7 @@ class main extends ChipBase {
   }
 
   override def setup(): Unit = {
-    chipLogic.loadROM("ROMs/tetris.ch8")
+    chipLogic.loadROM("ROMs/test_opcode.ch8")
     
     // Loads fonts used for window drawing (not the ones in memory)
     text("", 0, 0)
@@ -123,13 +125,11 @@ class main extends ChipBase {
   }
 }
 
-object main {
+object Chip8App {
   val WidthCellInPixels: Double = 12
   val HeightCellInPixels: Double = WidthCellInPixels
 
   def main(args: Array[String]): Unit = {
-    // This is needed for Processing, using the name
-    // of the class in a string is not very beautiful...
-    PApplet.main("chip.main")
+    PApplet.main("chip.Main")
   }
 }
