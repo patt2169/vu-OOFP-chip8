@@ -18,11 +18,13 @@ class Debugger(chipLogic: ChipLogic, app: ChipBase) {
     "ROMs/3-corax+.ch8",
     "ROMs/4-flags.ch8",
     "ROMs/6-keypad.ch8",
+    "ROMs/7-beep.ch8",
     "ROMs/IbmLogo.ch8",
     "ROMs/test_opcode.ch8",
-    "ROMs/tetris.ch8"
+    "ROMs/tetris.ch8",
+    "ROMs/slipperyslope.ch8"
   )
-  private var selectedRomIndex = romPaths.indexOf("ROMs/tetris.ch8")
+  private var selectedRomIndex = romPaths.indexOf("ROMs/slipperyslope.ch8")
 
   val gridDimensions: Dimensions = chipLogic.gridDims
   val widthInPixels: Int =
