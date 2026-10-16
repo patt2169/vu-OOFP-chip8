@@ -52,6 +52,7 @@ case class ChipState(
     def step(): ChipState = {
         require(isValidAddress(programCounter + 1), 
                 "Program counter must point to a complete instruction in memory")
+        if (stopExecution) this
 
         val newPastStates = this :: pastChipStates
 

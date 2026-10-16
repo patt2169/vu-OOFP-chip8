@@ -6,7 +6,7 @@ plugins {
 
 
 application {
-    mainClass.set('chip.main')
+    mainClass.set('chip.Chip8App')
 }
 
 

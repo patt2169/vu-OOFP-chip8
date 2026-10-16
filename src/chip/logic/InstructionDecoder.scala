@@ -1,7 +1,5 @@
 package chip.logic
 
-import scala.util.Random
-
 object InstructionDecoder {
     def decode(opcode: Int): Instruction = {
         val nibble1 = (opcode & 0xF000) >> 12
@@ -21,7 +19,7 @@ object InstructionDecoder {
             case 0x2 => CallSubroutine(nnn)
             case 0x3 => SkipEqualsConst(xReg, nn)
             case 0x4 => SkipNotEqualsConst(xReg, nn)
-            
+
             case 0x5 => n match {
                 case 0x0 => SkipEqualsReg(xReg, yReg)
                 case _   => UnsupportedOpcode(opcode)

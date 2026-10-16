@@ -3,11 +3,10 @@ import chip.helpers._
 
 class ChipLogic(val gridDims: Dimensions) {
 
-  var curChipState: ChipState = ChipState.initial(gridDims)
+  private var curChipState: ChipState = ChipState.initial(gridDims)
 
   def step(): Unit = {
-    if (curChipState.stopExecution == false)
-      curChipState = curChipState.step()
+    curChipState = curChipState.step()
   }
 
   def rewind(): Unit = {
@@ -30,6 +29,8 @@ class ChipLogic(val gridDims: Dimensions) {
     )
     curChipState.display(p.y)(p.x)
   }
+
+  def executionStopped(): Boolean = curChipState.stopExecution
 }
 
 object ChipLogic {
