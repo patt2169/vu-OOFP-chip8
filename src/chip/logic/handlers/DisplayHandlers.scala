@@ -10,10 +10,9 @@ trait DisplayHandlers {
     }
 
     def handleDrawSprite(xReg: Int, yReg: Int, n: Int): ChipState = {
-        require(
-            indexRegister + n <= memory.length,
-            "Sprite data must fit in memory"
-        )
+        if (indexRegister + n > memory.length) {
+            return makeErrorState("Cannot draw sprite: sprite data extends beyond memory")
+        }
 
         val startX = registers(xReg) % gridDims.width
         val startY = registers(yReg) % gridDims.height
@@ -35,7 +34,7 @@ trait DisplayHandlers {
         )
         copy(display = updatedDisplay, registers = updatedRegisters)
     }
-    
+
     private def drawSpriteRow(
         currentDisplay: Vector[Vector[Boolean]],
         spriteByte: Int,

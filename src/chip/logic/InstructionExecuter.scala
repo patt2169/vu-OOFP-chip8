@@ -4,7 +4,7 @@ object InstructionExecuter {
     def execute(state: ChipState, instruction: Instruction): ChipState = {
         instruction match {
             case e: DecodeError => 
-                state.copy(stopExecution = true, fault = Some(e.toString()))
+                state.makeErrorState(e.toString())
             case ClearScreen =>
                 state.handleClearScreen()
             case Jump(nnn) =>

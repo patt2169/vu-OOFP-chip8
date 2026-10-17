@@ -76,31 +76,31 @@ trait RegisterHandlers {
     copy(indexRegister = ChipLogic.FontStartAddress + registers(xReg) * 5)
   }
   def handleStoreBCD(xReg: Int): ChipState = {
-    require(
-      indexRegister + 2 < memory.length,
-      "BCD digits must fit in memory"
-    )
-    val value = registers(xReg)
-    val digits = Vector(value / 100, (value / 10) % 10, value % 10)
-    copy(memory = memory.patch(indexRegister, digits, digits.length))
+    if (indexRegister + 2 >= memory.length) {
+      makeErrorState("Cannot store BCD digits: memory range is out of bounds")
+    } else {
+      val value = registers(xReg)
+      val digits = Vector(value / 100, (value / 10) % 10, value % 10)
+      copy(memory = memory.patch(indexRegister, digits, digits.length))
+    }
   }
   def handleStoreRegisters(xReg: Int): ChipState = {
     val registerCount = xReg + 1
-    require(
-      indexRegister + registerCount <= memory.length,
-      "Registers must fit in memory"
-    )
-    val values = registers.take(registerCount)
-    copy(memory = memory.patch(indexRegister, values, values.length))
+    if (indexRegister + registerCount > memory.length) {
+      makeErrorState("Cannot store registers: memory range is out of bounds")
+    } else {
+      val values = registers.take(registerCount)
+      copy(memory = memory.patch(indexRegister, values, values.length))
+    }
   }
   def handleLoadRegisters(xReg: Int): ChipState = {
     val registerCount = xReg + 1
-    require(
-      indexRegister + registerCount <= memory.length,
-      "Registers must fit in memory"
-    )
-    val values = memory.slice(indexRegister, indexRegister + registerCount)
-    copy(registers = registers.patch(0, values, values.length))
+    if (indexRegister + registerCount > memory.length) {
+      makeErrorState("Cannot load registers: memory range is out of bounds")
+    } else {
+      val values = memory.slice(indexRegister, indexRegister + registerCount)
+      copy(registers = registers.patch(0, values, values.length))
+    }
   }
 
   private def subtractRegisters(

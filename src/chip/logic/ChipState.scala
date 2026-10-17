@@ -36,8 +36,17 @@ case class ChipState(
 
     def flagRegister: Int = registers(ChipLogic.FlagRegisterIndex)
 
-    private def isValidAddress(value: Int): Boolean = value >= 0 && value <= 0xffff && value < memory.length
+    private def isValidAddress(value: Int): Boolean = 
+        value >= 0 && value <= memory.length && value <= 0xffff
     private def isByte(value: Int): Boolean = value >= 0 && value <= 0xff
+
+    def makeErrorState(error: String): ChipState = {
+        copy(
+            stopExecution = true,
+            fault = Some(error),
+            programCounter = programCounter - 2
+        )
+    }
 
     def decrementTimers(): ChipState = {
         this.copy(
@@ -53,8 +62,11 @@ case class ChipState(
     def step(): ChipState = {
         if (stopExecution) return this
 
-        require(isValidAddress(programCounter + 1), 
-                "Program counter must point to a complete instruction in memory")
+        if (!isValidAddress(programCounter + 1)) {
+            return makeErrorState(
+                f"Cannot fetch a complete instruction at address 0x$programCounter%03X"
+            )
+        }
 
         val newPastStates = this :: pastChipStates
 
@@ -65,7 +77,9 @@ case class ChipState(
             copy(programCounter = programCounter + 2)
         val executedState =
             InstructionExecuter.execute(stateWithAdvancedProgramCounter, instruction)
-        executedState.copy(pastChipStates = newPastStates)
+        executedState.copy(
+            pastChipStates = newPastStates
+        )
     }
 
     def rewind(): ChipState = {

@@ -28,9 +28,10 @@ trait ControlFlowOps {
     copy(programCounter = nnn, stack = newStack)
   }
   def handleReturnSubroutine(): ChipState = {
-    val newPC = stack.head
-    val newStack = stack.drop(1)
-    copy(programCounter = newPC, stack = newStack)
+    if (stack.isEmpty)
+      makeErrorState("Cant return with empty stack")
+    else
+      copy(programCounter = stack.head, stack = stack.drop(1))
   }
   def handleSkipEqualsConst(xReg: Int, nn: Int): ChipState = {
     ifThenIncrPC(nn == registers(xReg))
