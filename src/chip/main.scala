@@ -1,62 +1,105 @@
 package chip
 
-import java.awt.event
-import processing.core.{PApplet, PConstants}
+import java.awt.event.KeyEvent._
+import ddf.minim.Minim
+import ddf.minim.ugens.{Oscil, Waves}
+
+import chip.logic.ChipLogic
+import engine.ChipBase
+import engine.graphics.{Point, Rectangle}
+import engine.graphics.Color._
+import processing.core.PApplet
 import processing.event.KeyEvent
 
-import java.awt.event.KeyEvent._
-import engine.ChipBase
-import engine.graphics.{Color, Point, Rectangle}
-import chip.logic.{ChipLogic}
-import chip.helpers.{Dimensions, Point => GridPoint}
-import engine.graphics.Color._
-import chip.logic.ChipRomReader
-
 class Main extends ChipBase {
+  protected var minim: Minim = _
+  protected var beep: Oscil = _
+  protected var beepActive: Boolean = false
 
-  var reversing: Boolean = false
+  protected val chipLogic = new ChipLogic(ChipLogic.DefaultGridDims)
+  protected val gridDimensions = chipLogic.gridDims
+  protected val widthInPixels = (Main.CellSizeInPixels * gridDimensions.width).ceil.toInt
+  protected val heightInPixels = (Main.CellSizeInPixels * gridDimensions.height).ceil.toInt
+  protected val defaultRomPath = "ROMs/slipperyslope.ch8"
+  private val screenArea =
+    Rectangle(Point(0, 0), widthInPixels.toFloat, heightInPixels.toFloat)
 
-  val chipLogic = new ChipLogic(ChipLogic.DefaultGridDims)
-  val instructionTimer = new UpdateTimer(ChipLogic.InstructionsPerSecond.toFloat)
-  val timerDecTimer = new UpdateTimer(ChipLogic.TimerDecrementsPerSecond.toFloat)
-  val gridDimensions : Dimensions =  chipLogic.gridDims
-  val widthInPixels: Int = (Chip8App.WidthCellInPixels * gridDimensions.width).ceil.toInt
-  val heightInPixels: Int = (Chip8App.HeightCellInPixels * gridDimensions.height).ceil.toInt
-  val screenArea: Rectangle = Rectangle(Point(0, 0), widthInPixels.toFloat, heightInPixels.toFloat)
+  protected var instructionsPerSecond = ChipLogic.InstructionsPerSecond
+  protected var instructionTimer = new UpdateTimer(instructionsPerSecond.toFloat)
+  protected val timerDecTimer = new UpdateTimer(ChipLogic.TimerDecrementsPerSecond.toFloat)
 
-  // this function is wrongly named draw by processing (is called on each update next to drawing)
+  protected def canvasWidth: Int = widthInPixels
+  protected def canvasHeight: Int = heightInPixels
+  
+  override def settings(): Unit = {
+    pixelDensity(displayDensity())
+    size(canvasWidth, canvasHeight)
+  }
+
+  override def setup(): Unit = {
+    text("", 0, 0)
+
+    minim = new Minim(this)
+    beep = new Oscil(440f, 0f, Waves.SINE)
+    beep.patch(minim.getLineOut())
+
+    chipLogic.loadROM(defaultRomPath)
+    resetTimers()
+  }
+
   override def draw(): Unit = {
-    updateState()
-    drawGrid()
+    updateEmulator()
+
+      val shouldBeep = chipLogic.status.soundTimer > 0
+      if (shouldBeep != beepActive) {
+        beep.setAmplitude(if (shouldBeep) 0.25f else 0f)
+        beepActive = shouldBeep
+      }
+
+    drawDisplay()
   }
 
-  def drawGrid(): Unit = {
+  override def keyPressed(event: KeyEvent): Unit =
+    updateChip8Key(event, pressed = true)
 
-    val widthPerCell = screenArea.width / gridDimensions.width
-    val heightPerCell = screenArea.height / gridDimensions.height
+  override def keyReleased(event: KeyEvent): Unit =
+    updateChip8Key(event, pressed = false)
 
-    def getCell(p : GridPoint): Rectangle = {
-      val leftUp = Point(screenArea.left + p.x * widthPerCell,
-        screenArea.top + p.y * heightPerCell)
-      Rectangle(leftUp, widthPerCell, heightPerCell)
-    }
-
-    def drawCell(area: Rectangle, color: Color): Unit = {
-      setFillColor(color)
-      drawRectangle(area)
-    }
-
-    for (p <- gridDimensions.allPointsInside) {
-      val color: Color = if (chipLogic.getCellState(p)) Green else Black
-      drawCell(getCell(p), color)
-    }
-
-    if (chipLogic.executionStopped()) drawExecutionStopped()
+  protected def resetTimers(): Unit = {
+    instructionTimer.init()
+    timerDecTimer.init()
   }
 
-  private def drawExecutionStopped(): Unit = {
-    setFillColor(Red)
-    drawTextCentered("Execution Stopped", 20, screenArea.center)
+  protected def updateEmulator(): Unit = {
+    while (instructionTimer.timeForNextFrame()) {
+      if (!chipLogic.executionStopped()) chipLogic.step()
+      instructionTimer.advanceFrame()
+    }
+
+    while (timerDecTimer.timeForNextFrame()) {
+      chipLogic.decrementTimers()
+      timerDecTimer.advanceFrame()
+    }
+  }
+
+  private def drawDisplay(): Unit = {
+    noStroke()
+    val cellWidth = screenArea.width / gridDimensions.width
+    val cellHeight = screenArea.height / gridDimensions.height
+
+    gridDimensions.allPointsInside.foreach { point =>
+      val leftUp = Point(
+        screenArea.left + point.x * cellWidth,
+        screenArea.top + point.y * cellHeight
+      )
+      setFillColor(if (chipLogic.getCellState(point)) Green else Black)
+      drawRectangle(Rectangle(leftUp, cellWidth, cellHeight))
+    }
+
+    if (chipLogic.executionStopped()) {
+      setFillColor(Red)
+      drawTextCentered("Execution Stopped", 20, screenArea.center)
+    }
   }
 
   private def updateChip8Key(event: KeyEvent, pressed: Boolean): Unit = {
@@ -77,58 +120,17 @@ class Main extends ChipBase {
       case VK_X => Some(0x0)
       case VK_C => Some(0xB)
       case VK_V => Some(0xF)
-      case VK_SPACE => { // TODO: questionable
-        reversing = pressed
-        None
-      }
-      case _    => None
+      case _ => None
     }
     chip8Key.foreach(key => chipLogic.setKeyPressed(key, pressed))
   }
+}
 
-  override def keyPressed(event: KeyEvent): Unit = {
-    updateChip8Key(event, pressed = true)
-  }
-
-  override def keyReleased(event: KeyEvent): Unit = {
-    updateChip8Key(event, pressed = false)
-  }
-
-  override def settings(): Unit = {
-    pixelDensity(displayDensity())
-    // If line below gives errors try size(widthInPixels, heightInPixels, PConstants.P2D)
-    size(widthInPixels, heightInPixels)
-  }
-
-  override def setup(): Unit = {
-    chipLogic.loadROM("ROMs/test_opcode.ch8")
-    
-    // Loads fonts used for window drawing (not the ones in memory)
-    text("", 0, 0)
-
-    instructionTimer.init()
-    timerDecTimer.init()
-  }
-
-
-  def updateState(): Unit = {
-    while (instructionTimer.timeForNextFrame()) {
-      if (!reversing) chipLogic.step()
-      else chipLogic.rewind()
-
-      instructionTimer.advanceFrame()
-    }
-    while (timerDecTimer.timeForNextFrame()) {
-      chipLogic.decrementTimers()
-      timerDecTimer.advanceFrame()
-    }
-  }
+object Main {
+  val CellSizeInPixels: Double = 12
 }
 
 object Chip8App {
-  val WidthCellInPixels: Double = 12
-  val HeightCellInPixels: Double = WidthCellInPixels
-
   def main(args: Array[String]): Unit = {
     PApplet.main("chip.Main")
   }
