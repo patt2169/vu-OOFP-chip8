@@ -1,3 +1,2 @@
 @echo off
-for /f "delims=" %%i in ('gradlew.bat -q printRuntimeClasspath') do set "CP=%%i"
-java -cp "%CP%" dotty.tools.MainGenericRunner -usejavacp
+powershell.exe -NoProfile -Command "$cp = (& '.\gradlew.bat' -q printRuntimeClasspath); if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }; & java -cp $cp dotty.tools.MainGenericRunner -usejavacp; exit $LASTEXITCODE"

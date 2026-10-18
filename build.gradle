@@ -4,6 +4,11 @@ plugins {
     id 'application'
 }
 
+tasks.register('printRuntimeClasspath') {
+    doLast {
+        println sourceSets.main.runtimeClasspath.asPath
+    }
+}
 
 application {
     mainClass.set('chip.Chip8App')
@@ -15,7 +20,6 @@ tasks.register('runDebugger', JavaExec) {
     classpath = sourceSets.main.runtimeClasspath
     mainClass.set('chip.Chip8Debugger')
 }
-
 
 ext {
     scalaMajorVersion = '3.3'
@@ -40,6 +44,8 @@ sourceSets.main.scala.srcDirs = ['src']
 sourceSets.main.scala.exclude 'test/**'
 
 dependencies {
+    runtimeOnly("org.scala-lang:scala3-compiler_3:${scalaVersion}")
+
     implementation 'net.compartmental.code:minim:2.2.2'
     
     implementation("org.processing:core:4.4.4")
