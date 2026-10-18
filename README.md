@@ -1,6 +1,6 @@
 gen AI use -
 tests are AI generated
-
+Random is AI generated SplitMix64
 
 source - https://tobiasvl.github.io/blog/write-a-chip-8-emulator/
 
