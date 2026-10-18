@@ -14,7 +14,7 @@ trait ControlFlowOps {
     else
       makeErrorState(f"Invalid PC incrementation to ${programCounter + 2} - 0x${programCounter + 2}%04X")
   }
-  private def ifThenIncrPC(bool: Boolean): ChipState = {
+  private def advancePCIf(bool: Boolean): ChipState = {
     if (bool) { incrementProgramCounter() }
     else { this }
   }
@@ -40,22 +40,22 @@ trait ControlFlowOps {
       copy(programCounter = stack.head, stack = stack.drop(1))
   }
   def handleSkipEqualsConst(xReg: Int, nn: Int): ChipState = {
-    ifThenIncrPC(nn == registers(xReg))
+    advancePCIf(nn == registers(xReg))
   }
   def handleSkipNotEqualsConst(xReg: Int, nn: Int): ChipState = {
-    ifThenIncrPC(nn != registers(xReg))
+    advancePCIf(nn != registers(xReg))
   }
   def handleSkipEqualsReg(xReg: Int, yReg: Int): ChipState = {
-    ifThenIncrPC(registers(xReg) == registers(yReg))
+    advancePCIf(registers(xReg) == registers(yReg))
   }
   def handleSkipNotEqualsReg(xReg: Int, yReg: Int): ChipState = {
-    ifThenIncrPC(registers(xReg) != registers(yReg))
+    advancePCIf(registers(xReg) != registers(yReg))
   }
   def handleSkipIfKeyPressed(xReg: Int): ChipState = {
-    ifThenIncrPC(isKeyPressed(xReg))
+    advancePCIf(isKeyPressed(xReg))
   }
   def handleSkipIfKeyNotPressed(xReg: Int): ChipState = {
-    ifThenIncrPC(!isKeyPressed(xReg))
+    advancePCIf(!isKeyPressed(xReg))
   }
   def handleGetKey(xReg: Int): ChipState = {
     val pressedKey = keypad.indexWhere(isPressed => isPressed)

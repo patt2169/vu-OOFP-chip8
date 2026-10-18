@@ -43,6 +43,7 @@ class ChipLogic(val gridDims: Dimensions) {
 
 object ChipLogic {
   val defaultRandSeed: Int = 1
+  val maxNumOfPastStates: Int = 1000
   val InstructionsPerSecond: Int = 700
   val TimerDecrementsPerSecond: Int = 60
   val MemorySize: Int = 4096

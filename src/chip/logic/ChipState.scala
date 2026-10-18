@@ -74,7 +74,7 @@ case class ChipState(
         val instruction = InstructionDecoder.decode(opcode)
 
         val stateWithAdvancedValues =
-            copy(programCounter = programCounter + 2, pastChipStates = this :: pastChipStates)
+            copy(programCounter = programCounter + 2, pastChipStates = (this :: pastChipStates).take(ChipLogic.maxNumOfPastStates))
 
         InstructionExecutor.execute(stateWithAdvancedValues, instruction)
     }
