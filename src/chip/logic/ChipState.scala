@@ -8,6 +8,7 @@ case class ChipState(
     // TODO: consider changing Ints to more specific
     //       make constraints obvious in types
     gridDims: Dimensions,
+    randomGen: Random = Random(ChipLogic.defaultRandSeed),
     stopExecution: Boolean = false,
     pastChipStates: List[ChipState] = List.empty,
     memory: Vector[Int] = ChipLogic.InitialMemory,
@@ -69,18 +70,13 @@ case class ChipState(
             )
         }
 
-        val newPastStates = this :: pastChipStates
-
         val opcode = (memory(programCounter) << 8) | memory(programCounter + 1)
         val instruction = InstructionDecoder.decode(opcode)
 
-        val stateWithAdvancedProgramCounter =
-            copy(programCounter = programCounter + 2)
-        val executedState =
-            InstructionExecuter.execute(stateWithAdvancedProgramCounter, instruction)
-        executedState.copy(
-            pastChipStates = newPastStates
-        )
+        val stateWithAdvancedValues =
+            copy(programCounter = programCounter + 2, pastChipStates = this :: pastChipStates)
+
+        InstructionExecuter.execute(stateWithAdvancedValues, instruction)
     }
 
     def rewind(): ChipState = {

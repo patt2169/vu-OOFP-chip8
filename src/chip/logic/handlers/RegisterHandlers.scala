@@ -1,7 +1,7 @@
 package chip.logic.handlers
 
 import chip.logic.{ChipLogic, ChipState}
-import scala.util.Random
+import chip.helpers.Random
 
 trait RegisterHandlers {
   self: ChipState =>
@@ -59,7 +59,8 @@ trait RegisterHandlers {
     shiftRegister(xReg, (value << 1) & 0xff, (value >> 7) & 0x01)
   }
   def handleGetRandom(xReg: Int, nn: Int): ChipState = {
-    handleSetRegister(xReg, Random.nextInt(0x100) & nn)
+    val (randValue, nextRandomGen) = randomGen.nextInt(0x100)
+    handleSetRegister(xReg, randValue & nn).copy(randomGen = nextRandomGen)
   }
   def handleAddIndexRegister(xReg: Int): ChipState = {
     val sum = indexRegister + registers(xReg)
