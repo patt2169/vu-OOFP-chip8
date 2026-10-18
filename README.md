@@ -1,3 +1,10 @@
+## TODO
+- Move pastChipStates from ChipState to Debugger
+- Clean up RomReader
+- Make State val types more clear
+- Detail unsure behavior in README
+
+
 This project implements a standard CHIP-8 interpreter designed to match the classic architecture used by early 8-bit microcomputers.
 
 ## Interpreter specification
@@ -7,7 +14,7 @@ This project implements a standard CHIP-8 interpreter designed to match the clas
 - Display: monochrome grid with a default resolution of 64x32 pixels.
 - Keyboard: 16-key hexadecimal keypad (`0`-`F`) with key press state tracking.
 - Program execution: ROMs are loaded at memory address `0x200`, while the built-in font set is stored starting at `0x050`.
-- Stack: 16-level call stack for subroutine handling.
+- Stack: call stack for subroutine handling.
 - Timers: delay and sound timers, both stored as 8-bit values and decremented at 60 Hz.
 - Execution speed: 700 instructions per second by default.
 - Instruction set: supports the core CHIP-8 instruction families for flow control, arithmetic, register operations, memory access, drawing, and input handling.
