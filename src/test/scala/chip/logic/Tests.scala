@@ -138,25 +138,19 @@ class Tests {
   }
 
   @Test
-  def registerMemoryInstructionsRejectRangesPastMemory(): Unit = {
+  def registerMemoryInstructionsFaultWhenRangesExceedMemory(): Unit = {
     val storeState = stateWithProgram(0xF155).copy(indexRegister = ChipLogic.MemorySize - 1)
     val loadState = stateWithProgram(0xF165).copy(indexRegister = ChipLogic.MemorySize - 1)
 
-    try {
-      storeState.step()
-      fail("Expected FX55 to reject a register range extending past memory")
-    } catch {
-      case error: IllegalArgumentException =>
-        assertEquals("requirement failed: Registers must fit in memory", error.getMessage)
-    }
+    val storeResult = storeState.step()
+    assertTrue(storeResult.stopExecution)
+    assertEquals(Some("Cannot store registers: memory range is out of bounds"), storeResult.fault)
+    assertEquals(ChipLogic.ProgramStartAddress, storeResult.programCounter)
 
-    try {
-      loadState.step()
-      fail("Expected FX65 to reject a register range extending past memory")
-    } catch {
-      case error: IllegalArgumentException =>
-        assertEquals("requirement failed: Registers must fit in memory", error.getMessage)
-    }
+    val loadResult = loadState.step()
+    assertTrue(loadResult.stopExecution)
+    assertEquals(Some("Cannot load registers: memory range is out of bounds"), loadResult.fault)
+    assertEquals(ChipLogic.ProgramStartAddress, loadResult.programCounter)
   }
 
   @Test
@@ -174,6 +168,20 @@ class Tests {
 
     assertEquals(3, afterAdd.registers(0))
     assertEquals(ChipLogic.ProgramStartAddress + 4, afterAdd.programCounter)
+  }
+
+  @Test
+  def randomInstructionRepeatsItsValueAfterRewind(): Unit = {
+    val state = stateWithProgram(0xC3A5)
+    val firstResult = state.step()
+    val rewoundState = firstResult.rewind()
+    val repeatedResult = rewoundState.step()
+
+    assertEquals(state, rewoundState)
+    assertEquals(firstResult.registers(3), repeatedResult.registers(3))
+    assertEquals(firstResult.randomGen, repeatedResult.randomGen)
+    assertEquals(0, firstResult.registers(3) & ~0xA5)
+    assertNotEquals(state.randomGen, firstResult.randomGen)
   }
 
   @Test
