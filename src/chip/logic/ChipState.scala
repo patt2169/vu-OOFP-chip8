@@ -36,8 +36,9 @@ case class ChipState(
 
     def flagRegister: Int = registers(ChipLogic.FlagRegisterIndex)
 
-    private def isValidAddress(value: Int): Boolean = 
-        value >= 0 && value <= memory.length && value <= 0xffff
+    final def isValidAddress(value: Int): Boolean = 
+        value >= 0 && value < memory.length && value <= 0xffff
+    
     private def isByte(value: Int): Boolean = value >= 0 && value <= 0xff
 
     def makeErrorState(error: String): ChipState = {

@@ -9,7 +9,10 @@ trait ControlFlowOps {
     keypad.lift(registers(xReg)).getOrElse(false)
   }
   private def incrementProgramCounter(): ChipState = {
-    copy(programCounter = programCounter + 2)
+    if (isValidAddress(programCounter + 2))
+      copy(programCounter = programCounter + 2)
+    else
+      makeErrorState(f"Invalid PC incrementation to ${programCounter + 2} - 0x${programCounter + 2}%04X")
   }
   private def ifThenIncrPC(bool: Boolean): ChipState = {
     if (bool) { incrementProgramCounter() }
@@ -17,7 +20,10 @@ trait ControlFlowOps {
   }
 
   def handleJump(nnn: Int): ChipState = {
-    copy(programCounter = nnn)
+    if (isValidAddress(nnn))
+      copy(programCounter = nnn)
+    else
+      makeErrorState(f"Invalid jump to $nnn - 0x$nnn%04X")
   }
   def handleJumpWithOffset(nnn: Int): ChipState = {
     val newPC = nnn + registers(0)
@@ -25,7 +31,7 @@ trait ControlFlowOps {
   }
   def handleCallSubroutine(nnn: Int): ChipState = {
     val newStack = programCounter :: stack
-    copy(programCounter = nnn, stack = newStack)
+    copy(stack = newStack).handleJump(nnn)
   }
   def handleReturnSubroutine(): ChipState = {
     if (stack.isEmpty)
