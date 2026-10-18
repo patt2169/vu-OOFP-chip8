@@ -3,6 +3,8 @@
 - Clean up RomReader
 - Make State val types more clear
 - Detail unsure behavior in README
+- Consider switching InstructionExecutor for a polymorphic execute function in Instruction
+- Split fault from State and instead have sibling or child case FaultedState
 
 
 This project implements a standard CHIP-8 interpreter designed to match the classic architecture used by early 8-bit microcomputers.
