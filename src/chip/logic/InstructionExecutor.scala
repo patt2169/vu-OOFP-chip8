@@ -1,6 +1,6 @@
 package chip.logic
 
-object InstructionExecuter {
+object InstructionExecutor {
     def execute(state: ChipState, instruction: Instruction): ChipState = {
         instruction match {
             case e: DecodeError => 

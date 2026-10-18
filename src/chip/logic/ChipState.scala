@@ -76,7 +76,7 @@ case class ChipState(
         val stateWithAdvancedValues =
             copy(programCounter = programCounter + 2, pastChipStates = this :: pastChipStates)
 
-        InstructionExecuter.execute(stateWithAdvancedValues, instruction)
+        InstructionExecutor.execute(stateWithAdvancedValues, instruction)
     }
 
     def rewind(): ChipState = {
