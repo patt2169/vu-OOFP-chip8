@@ -50,11 +50,10 @@ class Main extends ChipBase {
   override def draw(): Unit = {
     updateEmulator()
 
-      val shouldBeep = chipLogic.status.soundTimer > 0
-      if (shouldBeep != beepActive) {
-        beep.setAmplitude(if (shouldBeep) 0.25f else 0f)
-        beepActive = shouldBeep
-      }
+    if (chipLogic.shouldBeep != beepActive) {
+      beep.setAmplitude(if (chipLogic.shouldBeep) 0.25f else 0f)
+      beepActive = chipLogic.shouldBeep
+    }
 
     drawDisplay()
   }

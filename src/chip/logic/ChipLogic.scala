@@ -1,17 +1,6 @@
 package chip.logic
 import chip.helpers._
 
-case class ChipStatus(
-    programCounter: Int,
-    opcode: Option[Int],
-    instruction: Option[Instruction],
-    registers: Vector[Int],
-    delayTimer: Int,
-    soundTimer: Int,
-    executionStopped: Boolean,
-    fault: Option[String]
-)
-
 class ChipLogic(val gridDims: Dimensions) {
 
   private var curChipState: ChipState = ChipState.initial(gridDims)
@@ -45,34 +34,11 @@ class ChipLogic(val gridDims: Dimensions) {
     curChipState.display(p.y)(p.x)
   }
 
+  def getStateStatus: ChipStatus = { ChipStatus.statusOfState(curChipState) }
+
   def executionStopped(): Boolean = curChipState.stopExecution
 
-  def status: ChipStatus = {
-    val statusProgramCounter =
-      if (curChipState.fault.nonEmpty) curChipState.programCounter - 2
-      else curChipState.programCounter
-    val opcode =
-      if (statusProgramCounter >= 0 &&
-          statusProgramCounter + 1 < curChipState.memory.length) {
-        Some(
-          (curChipState.memory(statusProgramCounter) << 8) |
-            curChipState.memory(statusProgramCounter + 1)
-        )
-      } else {
-        None
-      }
-
-    ChipStatus(
-      programCounter = statusProgramCounter,
-      opcode = opcode,
-      instruction = opcode.map(InstructionDecoder.decode),
-      registers = curChipState.registers,
-      delayTimer = curChipState.delayTimer,
-      soundTimer = curChipState.soundTimer,
-      executionStopped = curChipState.stopExecution,
-      fault = curChipState.fault
-    )
-  }
+  def shouldBeep: Boolean = { curChipState.soundTimer > 0 }
 }
 
 object ChipLogic {

@@ -9,6 +9,8 @@ import engine.graphics.Color._
 import processing.core.PApplet
 import processing.event.KeyEvent
 
+import chip.logic.ChipStatus
+
 class Debugger extends Main {
   private var reversing = false
   private var paused = false
@@ -73,7 +75,7 @@ class Debugger extends Main {
       y += lineHeight
     }
 
-    val status = chipLogic.status
+    val status = chipLogic.getStateStatus
     val runState =
       if (status.executionStopped) "FAULTED"
       else if (reversing) "REWINDING"
