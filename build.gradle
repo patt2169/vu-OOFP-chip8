@@ -67,8 +67,17 @@ task zip(type: Zip) {
     outputs.upToDateWhen { false }
     dependsOn assemble
     dependsOn testClasses
-    from fileTree(dir: '.')
-    include 'src/chip/logic/**.scala'
+    from projectDir
+    include 'build.gradle'
+    include 'gradlew'
+    include 'gradlew.bat'
+    include 'repl.bat'
+    include 'repl.sh'
+    include 'README.md'
+    include 'gradle/wrapper/**'
+    include 'src/**'
+    include 'ROMs/**'
+    include 'demos/**'
 
     archiveFileName = 'chip.zip'
     destinationDirectory = layout.buildDirectory.dir("$projectDir")
