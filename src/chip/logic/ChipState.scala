@@ -5,8 +5,6 @@ import chip.logic.handlers.DisplayHandlers
 import chip.logic.handlers.RegisterHandlers
 
 case class ChipState(
-    // TODO: consider changing Ints to more specific
-    //       make constraints obvious in types
     gridDims: Dimensions,
     randomGen: Random = Random(ChipLogic.defaultRandSeed),
     stopExecution: Boolean = false,

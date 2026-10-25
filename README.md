@@ -1,13 +1,20 @@
-## TODO
-- Move pastChipStates from ChipState to Debugger
-- Clean up RomReader
-- Make State val types more clear
-- Detail unsure behavior in README
-- Consider switching InstructionExecutor for a polymorphic execute function in Instruction
-- Split fault from State and instead have sibling or child case FaultedState
+This project implements a standard CHIP-8 interpreter.
 
+## Running
 
-This project implements a standard CHIP-8 interpreter designed to match the classic architecture used by early 8-bit microcomputers.
+Run the standalone CHIP-8 emulator with `gradlew run` (Windows: `gradlew.bat run`).
+Run the debugger interface with `gradlew runDebugger` (Windows: `gradlew.bat runDebugger`).
+Both applications start with `ROMs/slipperyslope.ch8`.
+
+## Notes
+Change defaultRomPath in main to change the ROM used when running using run.
+The debugger uses a vector romPaths to store each path as a String.
+## Debugger commands
+Use L and K to go to the next or previous ROM.
+Use H and J to slow down or speed up instructions/sec.
+Use P to pause the execution.
+Use SPACE to rewind.
+
 
 ## Interpreter specification
 
@@ -25,6 +32,8 @@ The interpreter includes the standard CHIP-8 drawing behavior using sprite-based
 
 This implementation intentionally follows the classic CHIP-8 model rather than Super-CHIP or other modern extensions.
 
+The interpreter holds maxNumOfPastStates number of past states at once this can be changed in ChipLogic.
+
 ## Gen AI use
 
 I used AI allthroughout this project.
@@ -34,10 +43,13 @@ This allowed me to dictate the structure of my code while skipping out on the bu
 Additionally I regurarly used AI to evaluate the project as I was working.
 
 - Tests is fully AI generated
-- Random is AI generated SplitMix64 (I needed an immutable Random Generator Object which gave numbers that didn't feel random when emulated using the standard library mutable Random)
+- Random is AI generated SplitMix64 (I needed an immutable Random Generator Object, which gave numbers that didn't feel random when emulated using the standard library mutable Random)
+- build.gradle is mostly AI generated
 
-## Running
-
-Run the standalone CHIP-8 emulator with `gradlew run` (Windows: `gradlew.bat run`).
-Run the debugger interface with `gradlew runDebugger` (Windows: `gradlew.bat runDebugger`).
-Both applications start with `ROMs/slipperyslope.ch8`.
+## TODO
+- Move pastChipStates from ChipState to Debugger
+- Clean up RomReader
+- Make State val types more clear
+- Detail unsure behavior in README
+- Consider switching InstructionExecutor for a polymorphic execute function in Instruction
+- Split fault from State and instead have sibling or child case FaultedState
