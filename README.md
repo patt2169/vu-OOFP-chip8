@@ -1,18 +1,22 @@
 This project implements a standard CHIP-8 interpreter.
 
+This project is still a work in progress (see TODO at end of readme)
+
 ## Running
 
 Run the standalone CHIP-8 emulator with `gradlew run` (Windows: `gradlew.bat run`).
 Run the debugger interface with `gradlew runDebugger` (Windows: `gradlew.bat runDebugger`).
 Both applications start with `ROMs/slipperyslope.ch8`.
 
-## Notes
 Change defaultRomPath in main to change the ROM used when running using run.
 The debugger uses a vector romPaths to store each path as a String.
+
 ## Debugger commands
+
 Use L and K to go to the next or previous ROM.
 Use H and J to slow down or speed up instructions/sec.
-Use P to pause the execution.
+Use P to pause the execution, when paused use N to execute one step.
+Use T to reset the current execution.
 Use SPACE to rewind.
 
 
@@ -47,7 +51,9 @@ Additionally I regurarly used AI to evaluate the project as I was working.
 - build.gradle is mostly AI generated
 
 ## TODO
+
 - Move pastChipStates from ChipState to Debugger
+- Do style pass
 - Clean up RomReader
 - Make State val types more clear
 - Detail unsure behavior in README
